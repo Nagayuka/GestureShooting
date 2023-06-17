@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <title>p5MediaPipeHands Hands Landmarker</title>
+  <style>
+    .container {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+    }
+
+    video {
+      -webkit-transform: scaleX(-1);
+    }
+  </style>
+</head>
+
+<body>
+
+  <body>
+    <h1>Space War</h1>
+    <p id="message"></p>
+    <div class="container">
+      <div>
+        <button id="webcamButton">
+          ENABLE WEBCAM
+        </button>
+        <video id="webcam" style="height:400px;" autoplay playsinline></video>
+      </div>
+      <div>
+        <button id="gameButton" onclick="startGame();">
+          start game
+        </button>
+        <button id="titleButton" onclick="titleGame();">
+          title
+        </button>
+        <div id="canvas"></div>
+      </div>
+    </div>
+
+    <!-- include js libraries -->
+    <script src="./js/drawing_utils.js" crossorigin="anonymous"></script>
+    <script src="./js/hands.js" crossorigin="anonymous"></script>
+    <script src="./js/p5.js"></script>
+    <script src="./js/p5.sound.min.js"></script>
+    <script src="./js/p5.collide2d.js"></script>
+    <script src="./js/sketch.js"></script>
+    <script type="module" src="./js/script.js"></script>
+
+
+
+  </body>
+
+</html>
