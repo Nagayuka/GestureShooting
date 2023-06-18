@@ -36,6 +36,7 @@ let sound_end_bakuhatsu;
 let bgm_title;
 let bgm_playing;
 let bgm_end;
+
 function preload() {
   sound_bakuhatsu = loadSound("./sound/8bit爆発2.mp3");
   sound_missile = loadSound("./sound/8bitショット1.mp3");
@@ -143,6 +144,10 @@ function drawGameOverScreen() {
 }
 
 var theta = 0;
+
+// ミサイルが爆発したかどうかのフラグ
+let missileExploded = false;
+
 function updateGame() {
   // 自機の移動
   if (keyIsDown(LEFT_ARROW)) {
@@ -202,6 +207,7 @@ function updateGame() {
   ) {
     score += 100;
     missileActive = false;
+    missileExploded = true;
 
     // 敵機が爆発するエフェクト
     fill(255, 0, 0);
@@ -211,6 +217,7 @@ function updateGame() {
       enemySize,
       enemySize
     );
+    rect(200, 150 + gameHeight, enemySize, enemySize);
     sound_bakuhatsu.play();
 
     // 新しい敵機を生成
@@ -273,7 +280,15 @@ function drawGame() {
   textAlign(RIGHT);
   textSize(20);
   text("Time: " + timer, width - 20, 60);
+
+  // ミサイルの爆発描画
+  if (missileExploded) {
+    fill(255, 0, 0);
+    ellipse(200, 700, 100, 100);
+    missileExploded = false; // 爆発描画後にフラグをリセットする
+  }
 }
+
 function AnotherAngle() {
   // この範囲に描画
   fill(255, 255, 255);
@@ -284,12 +299,6 @@ function AnotherAngle() {
   stroke(0);
   rect(10, gameHeight, 380, 300);
 
-  // ミサイルの描画
-  if (missileActive) {
-    fill(0, 0, 255);
-    rect(missileX, missileY + 400, missileSize, missileSize);
-  }
-
   // 自機の描画
   fill(0, 255, 0);
   ellipse(200, 350 + gameHeight, playerSize, playerSize);
@@ -297,22 +306,53 @@ function AnotherAngle() {
   // 敵機の描画（相対位置）
   fill(255, 0, 0);
   let relativeEnemyX = (enemyX - playerX) * 5 + 200;
-  let relativeEnemyY = gameHeight + 150;
-
   let enemyDistance = enemyY - playerY;
+  let relativeEnemyY = map(
+    enemyDistance,
+    0,
+    -400,
+    150 + gameHeight,
+    gameHeight
+  );
 
   if (enemyDistance <= 0) {
     let scaledEnemySize = map(enemyDistance, 0, -400, 150, 0); // サイズを調整（enemyDistanceを負の値に変更）
-    ellipse(relativeEnemyX, relativeEnemyY, scaledEnemySize, scaledEnemySize);
+    ellipse(relativeEnemyX, 150 + gameHeight, scaledEnemySize, scaledEnemySize);
   }
 
   // 十字を書く
   stroke(0);
-  line(200, 50 + gameHeight, 200, 250 + gameHeight);
-  line(100, 150 + gameHeight, 300, 150 + gameHeight);
+  line(200, 20 + gameHeight, 200, 280 + gameHeight);
+  line(50, 150 + gameHeight, 350, 150 + gameHeight);
   noFill();
-  ellipse(200, 150 + gameHeight, 50, 50);
   ellipse(200, 150 + gameHeight, 100, 100);
+  ellipse(200, 150 + gameHeight, 200, 200);
+
+  // 右側に右三角矢印を描く
+  if (relativeEnemyX >= 400) {
+    fill(0, 0, 0);
+    triangle(
+      350,
+      relativeEnemyY,
+      350,
+      relativeEnemyY - 20,
+      370,
+      relativeEnemyY - 10
+    );
+  }
+
+  // 左側に左三角矢印を描く
+  if (relativeEnemyX <= 0) {
+    fill(0, 0, 0);
+    triangle(
+      50,
+      relativeEnemyY,
+      50,
+      relativeEnemyY - 20,
+      30,
+      relativeEnemyY - 10
+    );
+  }
 }
 
 function keyPressed() {}
