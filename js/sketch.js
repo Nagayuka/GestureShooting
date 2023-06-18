@@ -95,7 +95,7 @@ function draw() {
       for (const landmarks of hr.landmarks) {
         for (let landmark of landmarks) {
           noStroke();
-          fill(100, 150, 210);
+          fill(100, 150, 210); //手の色
           circle(landmark.x * width, landmark.y * gameHeight, 10);
         }
       }
@@ -105,9 +105,11 @@ function draw() {
 
   if (gameState === GAME_STATE_TITLE) {
     drawTitleScreen();
+    AnotherAngle();
   } else if (gameState === GAME_STATE_PLAYING) {
     updateGame();
     drawGame();
+    AnotherAngle();
   } else if (gameState === GAME_STATE_GAMEOVER) {
     drawGameOverScreen();
   }
@@ -117,6 +119,7 @@ function draw() {
   stroke(0);
   strokeWeight(2);
   rect(0, 0, width, height);
+  //fill(230, 240, 255);
   rect(0, 0, width, gameHeight);
 }
 
@@ -270,6 +273,46 @@ function drawGame() {
   textAlign(RIGHT);
   textSize(20);
   text("Time: " + timer, width - 20, 60);
+}
+function AnotherAngle() {
+  // この範囲に描画
+  fill(255, 255, 255);
+  rect(0, gameHeight, 400, 400);
+
+  // 窓
+  fill(230, 240, 255);
+  stroke(0);
+  rect(10, gameHeight, 380, 300);
+
+  // ミサイルの描画
+  if (missileActive) {
+    fill(0, 0, 255);
+    rect(missileX, missileY + 400, missileSize, missileSize);
+  }
+
+  // 自機の描画
+  fill(0, 255, 0);
+  ellipse(200, 350 + gameHeight, playerSize, playerSize);
+
+  // 敵機の描画（相対位置）
+  fill(255, 0, 0);
+  let relativeEnemyX = (enemyX - playerX) * 5 + 200;
+  let relativeEnemyY = gameHeight + 150;
+
+  let enemyDistance = enemyY - playerY;
+
+  if (enemyDistance <= 0) {
+    let scaledEnemySize = map(enemyDistance, 0, -400, 150, 0); // サイズを調整（enemyDistanceを負の値に変更）
+    ellipse(relativeEnemyX, relativeEnemyY, scaledEnemySize, scaledEnemySize);
+  }
+
+  // 十字を書く
+  stroke(0);
+  line(200, 50 + gameHeight, 200, 250 + gameHeight);
+  line(100, 150 + gameHeight, 300, 150 + gameHeight);
+  noFill();
+  ellipse(200, 150 + gameHeight, 50, 50);
+  ellipse(200, 150 + gameHeight, 100, 100);
 }
 
 function keyPressed() {}
