@@ -325,8 +325,8 @@ function AnotherAngle() {
   line(200, 20 + gameHeight, 200, 280 + gameHeight);
   line(50, 150 + gameHeight, 350, 150 + gameHeight);
   noFill();
-  ellipse(200, 150 + gameHeight, 100, 100);
-  ellipse(200, 150 + gameHeight, 200, 200);
+  ellipse(200, 150 + gameHeight, 80, 80);
+  ellipse(200, 150 + gameHeight, 150, 150);
 
   // 右側に右三角矢印を描く
   if (relativeEnemyX >= 400) {
