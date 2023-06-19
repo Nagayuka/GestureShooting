@@ -1,4 +1,10 @@
 let gameHeight = 400;
+let angle = 0;
+let handleLength = 50;
+let handleX = 200;
+let handleY = gameHeight + 350;
+let centerX = 200;
+let centerY = 350 + gameHeight;
 
 // hr: Hand Results
 let hr;
@@ -38,11 +44,12 @@ let bgm_playing;
 let bgm_end;
 
 function preload() {
-  sound_bakuhatsu = loadSound("./sound/8bit爆発2.mp3");
+  sound_bakuhatsu = loadSound("./sound/決定ボタンを押す21.mp3");
   sound_missile = loadSound("./sound/8bitショット1.mp3");
   sound_end_bakuhatsu = loadSound("./sound/8bit爆発1.mp3");
   bgm_title = loadSound("./sound/Shooting_02.mp3");
-  bgm_playing = loadSound("./sound/Shooting_01.mp3");
+  // bgm_playing = loadSound("./sound/Shooting_01.mp3");
+  bgm_playing = loadSound("./sound/かえるのピアノ.mp3");
   bgm_end = loadSound("./sound/Shooting_05.mp3");
 }
 
@@ -67,9 +74,17 @@ function setup() {
       let name = hr.gestures[0][0].categoryName;
       console.log(name, score);
     }
+
     // ---------------------------
     // ここに自機を動かす処理を書く
     // ---------------------------
+
+    if ((results === "BAN") & !missileActive) {
+      sound_missile.play();
+      missileX = playerX + playerSize / 2;
+      missileY = playerY;
+      missileActive = true;
+    }
   };
 
   // 初期化
@@ -109,10 +124,35 @@ function draw() {
         for (let i = 0; i < landmarks.length; i++) {
           let landmark = landmarks[i];
           if (i === 4) {
-            console.log("座標:", landmark.x * width, landmark.y * gameHeight);
+            let oyayubiX = landmark.x * width; // 下の円のX座標
+            let oyayubiY = landmark.y * gameHeight; // 下の円のY座標
+            console.log("座標:", "x", oyayubiX, "Y:", oyayubiY);
             noStroke();
             fill(0, 0, 250); //手の色
-            circle(landmark.x * width, landmark.y * gameHeight, 10);
+            circle(oyayubiX, oyayubiY, 10);
+
+            // playerX = oyayubiX;
+            // playerY = oyayubiY;
+
+            // 中心座標を計算
+            centerX = width / 2;
+            centerY = gameHeight + 350;
+
+            // マウスのy座標に応じて角度を計算
+            let mouseYMapped = map(oyayubiY, 0, 400, -150, 150);
+            angle = mouseYMapped;
+
+            // ハンドルの長さを設定
+            let handleLength = 50; // ハンドルの長さを設定
+
+            // ハンドルの位置を計算
+            handleX = centerX + cos(radians(angle)) * handleLength;
+            handleY = centerY + sin(radians(angle)) * handleLength;
+
+            // ハンドルが中心より左に行かないように制限
+            handleX = max(handleX, centerX); // handleXがcenterXより小さい場合はcenterXを使用
+
+            strokeWeight(1);
           }
         }
       }
@@ -234,7 +274,7 @@ function updateGame() {
       enemySize,
       enemySize
     );
-    rect(200, 150 + gameHeight, enemySize, enemySize);
+
     sound_bakuhatsu.play();
 
     // 新しい敵機を生成
@@ -274,18 +314,20 @@ function updateGame() {
 }
 
 function drawGame() {
-  // 自機の描画
-  fill(0, 255, 0);
+  // 自機の描画 茶色
+  fill(209, 109, 19);
   rect(playerX, playerY, playerSize, playerSize);
 
-  // ミサイルの描画
+  // ミサイルの描画 黄色
   if (missileActive) {
-    fill(0, 0, 255);
+    fill(200, 200, 0);
+    stroke(0, 0, 0);
     rect(missileX, missileY, missileSize, missileSize);
   }
 
   // 敵機の描画
   fill(255, 0, 0);
+  noStroke();
   rect(enemyX, enemyY, enemySize, enemySize);
 
   // スコアの表示
@@ -306,30 +348,10 @@ function drawGame() {
   }
 }
 
-let angle = 0;
-let handleLength = 50;
-
 function handle() {
-  // 中心座標を計算
-  let centerX = width / 2;
-  let centerY = gameHeight + 350;
-
-  // マウスのy座標に応じて角度を計算
-  let mouseYMapped = map(mouseY, 0, gameHeight, 0, 400);
-  angle = mouseYMapped;
-
-  // ハンドルの長さを設定
-  let handleLength = 50; // ハンドルの長さを設定
-
-  // ハンドルの位置を計算
-  let handleX = centerX + cos(radians(angle)) * handleLength;
-  let handleY = centerY + sin(radians(angle)) * handleLength;
-
-  // ハンドルが中心より左に行かないように制限
-  handleX = max(handleX, centerX); // handleXがcenterXより小さい場合はcenterXを使用
-
   // 円を描画
   strokeWeight(2);
+  fill(255, 255, 255);
   circle(centerX, centerY, handleLength * 2);
 
   //範囲
@@ -340,14 +362,16 @@ function handle() {
   circle(centerX + 43, centerY + 25, 10); //した
   circle(centerX + 43, centerY - 25, 10);
   circle(centerX, centerY - 50, 10);
+  circle(centerX - 43, centerY + 25, 10); //した
+  circle(centerX - 43, centerY - 25, 10);
 
   // ハンドルの点を描画
-  fill(255, 0, 0);
+  fill(0, 0, 0);
   noStroke();
   circle(handleX, handleY, 15);
 
   // 線を描画
-  stroke(0, 0, 255);
+  stroke(0, 0, 100);
   strokeWeight(5);
   line(centerX, centerY, handleX, handleY); // ハンドルに向かう線
   line(
@@ -359,25 +383,21 @@ function handle() {
 
   // ハンドルによる自機の移動
   if (handleY > centerY + 25) {
-    playerX += 4;
+    playerX += 5;
   } else if (handleY < centerY - 25) {
-    playerX -= 4;
+    playerX -= 5;
   }
 }
 
 function AnotherAngle() {
-  // この範囲に描画
-  fill(106, 109, 130);
+  // この範囲に描画　茶色に塗る
+  fill(209, 109, 19);
   rect(0, gameHeight, 400, 400);
 
-  // 窓
-  fill(0, 0, 0);
+  // 窓 水色
+  fill(100, 200, 255);
   stroke(0);
   rect(10, gameHeight, 380, 300);
-
-  // 自機の描画
-  fill(0, 255, 0);
-  ellipse(200, 350 + gameHeight, playerSize, playerSize);
 
   // 敵機の描画（相対位置）
   fill(0, 255, 0);
@@ -393,23 +413,78 @@ function AnotherAngle() {
 
   if (enemyDistance <= 0) {
     let scaledEnemySize = map(enemyDistance, 0, -400, 150, 0); // サイズを調整（enemyDistanceを負の値に変更）
-    ellipse(relativeEnemyX, 150 + gameHeight, scaledEnemySize, scaledEnemySize);
+    let faceSize = scaledEnemySize; // 顔のサイズを設定
+
+    // 顔を描画　肌色に塗る
+    fill(255, 200, 200);
+    ellipse(relativeEnemyX, 150 + gameHeight, faceSize, faceSize);
+
+    // 左目を描画
+    let eyeSize = faceSize * 0.1; // 目のサイズを設定
+    fill(0, 0, 0);
+    ellipse(
+      relativeEnemyX - faceSize * 0.15,
+      150 + gameHeight - faceSize * 0.1,
+      eyeSize * 1.5,
+      eyeSize / 3
+    );
+
+    // 右目を描画
+    ellipse(
+      relativeEnemyX + faceSize * 0.15,
+      150 + gameHeight - faceSize * 0.1,
+      eyeSize * 1.5,
+      eyeSize / 3
+    );
+
+    // 口を描画
+    let mouthSize = faceSize * 0.3; // 口のサイズを設定
+    fill(255, 0, 0);
+    ellipse(
+      relativeEnemyX,
+      150 + gameHeight + faceSize * 0.1,
+      mouthSize,
+      mouthSize
+    );
+    //オレンジに塗る
+    fill(255, 100, 0);
+    ellipse(
+      relativeEnemyX + mouthSize,
+      150 + gameHeight + faceSize * 0.1,
+      mouthSize,
+      mouthSize
+    );
+    ellipse(
+      relativeEnemyX - mouthSize,
+      150 + gameHeight + faceSize * 0.1,
+      mouthSize,
+      mouthSize
+    );
+    //アンコ 茶色に塗る
+    fill(209, 109, 19);
+    ellipse(
+      relativeEnemyX + mouthSize * 0.8,
+      150 + gameHeight - faceSize * 0.3,
+      mouthSize,
+      mouthSize / 2
+    );
   }
 
   // 十字を書く
-  stroke(255);
+  stroke(0);
   line(200, 20 + gameHeight, 200, 280 + gameHeight);
   line(50, 150 + gameHeight, 350, 150 + gameHeight);
   noFill();
   ellipse(200, 150 + gameHeight, 80, 80);
   ellipse(200, 150 + gameHeight, 150, 150);
 
-  stroke(166, 222, 240);
-  ellipse(200, 150 + gameHeight, 150, 150);
+  // stroke(166, 222, 240);
+  // ellipse(200, 150 + gameHeight, 150, 150);
 
   // 右側に右三角矢印を描く
   if (relativeEnemyX >= 400) {
     fill(255);
+    noStroke();
     triangle(
       350,
       relativeEnemyY,
@@ -441,6 +516,24 @@ function AnotherAngle() {
   }
 
   handle();
+
+  //もしmissileactiveがtrueなら、丸を描く
+  if (missileActive) {
+    noStroke();
+    fill(255, 200, 200, 180);
+    ellipse(200, 150 + gameHeight, 150, 150);
+
+    fill(0, 0, 0, 180);
+    ellipse(180, 120 + gameHeight, 10, 20);
+    ellipse(220, 120 + gameHeight, 10, 20);
+
+    fill(255, 0, 0, 180);
+    ellipse(200, 150 + gameHeight, 50, 50);
+    //オレンジに塗る
+    fill(255, 100, 0, 180);
+    ellipse(250, 150 + gameHeight, 50, 50);
+    ellipse(150, 150 + gameHeight, 50, 50);
+  }
 }
 
 function keyPressed() {}
