@@ -289,13 +289,55 @@ function drawGame() {
   }
 }
 
+let angle = 0;
+let handleLength = 50;
+
+function handle() {
+  // 中心座標を計算
+  let centerX = width / 2;
+  let centerY = gameHeight + 350;
+
+  // マウスのy座標に応じて角度を計算
+  let mouseYMapped = map(mouseY, 0, height, 0, 400);
+  angle = mouseYMapped;
+
+  // ハンドルの長さを設定
+  let handleLength = 50; // ハンドルの長さを設定
+
+  // ハンドルの位置を計算
+  let handleX = centerX + cos(radians(angle)) * handleLength;
+  let handleY = centerY + sin(radians(angle)) * handleLength;
+
+  // ハンドルが中心より左に行かないように制限
+  handleX = max(handleX, centerX); // handleXがcenterXより小さい場合はcenterXを使用
+
+  // 円を描画
+  strokeWeight(2);
+  circle(centerX, centerY, handleLength * 2);
+
+  // ハンドルの点を描画
+  fill(255, 0, 0);
+  noStroke();
+  circle(handleX, handleY, 10);
+
+  // 線を描画
+  stroke(255, 0, 0);
+  line(centerX, centerY, handleX, handleY); // ハンドルに向かう線
+  line(
+    centerX,
+    centerY,
+    centerX - (handleX - centerX),
+    centerY - (handleY - centerY)
+  ); // 円の中心から反対方向に向かう線
+}
+
 function AnotherAngle() {
   // この範囲に描画
-  fill(255, 255, 255);
+  fill(106, 109, 130);
   rect(0, gameHeight, 400, 400);
 
   // 窓
-  fill(230, 240, 255);
+  fill(0, 0, 0);
   stroke(0);
   rect(10, gameHeight, 380, 300);
 
@@ -304,7 +346,7 @@ function AnotherAngle() {
   ellipse(200, 350 + gameHeight, playerSize, playerSize);
 
   // 敵機の描画（相対位置）
-  fill(255, 0, 0);
+  fill(0, 255, 0);
   let relativeEnemyX = (enemyX - playerX) * 5 + 200;
   let enemyDistance = enemyY - playerY;
   let relativeEnemyY = map(
@@ -321,7 +363,7 @@ function AnotherAngle() {
   }
 
   // 十字を書く
-  stroke(0);
+  stroke(255);
   line(200, 20 + gameHeight, 200, 280 + gameHeight);
   line(50, 150 + gameHeight, 350, 150 + gameHeight);
   noFill();
@@ -330,7 +372,7 @@ function AnotherAngle() {
 
   // 右側に右三角矢印を描く
   if (relativeEnemyX >= 400) {
-    fill(0, 0, 0);
+    fill(255);
     triangle(
       350,
       relativeEnemyY,
@@ -343,7 +385,7 @@ function AnotherAngle() {
 
   // 左側に左三角矢印を描く
   if (relativeEnemyX <= 0) {
-    fill(0, 0, 0);
+    fill(255);
     triangle(
       50,
       relativeEnemyY,
@@ -353,6 +395,14 @@ function AnotherAngle() {
       relativeEnemyY - 10
     );
   }
+
+  if (missileExploded) {
+    fill(255, 0, 0);
+    ellipse(200, 700 + gameHeight, 100, 100);
+    missileExploded = false; // 爆発描画後にフラグをリセットする
+  }
+
+  handle();
 }
 
 function keyPressed() {}
