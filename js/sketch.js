@@ -102,6 +102,23 @@ function draw() {
       }
     }
   }
+
+  if (hr) {
+    if (hr.landmarks) {
+      for (const landmarks of hr.landmarks) {
+        for (let i = 0; i < landmarks.length; i++) {
+          let landmark = landmarks[i];
+          if (i === 4) {
+            console.log("座標:", landmark.x * width, landmark.y * gameHeight);
+            noStroke();
+            fill(0, 0, 250); //手の色
+            circle(landmark.x * width, landmark.y * gameHeight, 10);
+          }
+        }
+      }
+    }
+  }
+
   //background(100);
 
   if (gameState === GAME_STATE_TITLE) {
@@ -298,7 +315,7 @@ function handle() {
   let centerY = gameHeight + 350;
 
   // マウスのy座標に応じて角度を計算
-  let mouseYMapped = map(mouseY, 0, height, 0, 400);
+  let mouseYMapped = map(mouseY, 0, gameHeight, 0, 400);
   angle = mouseYMapped;
 
   // ハンドルの長さを設定
@@ -315,13 +332,23 @@ function handle() {
   strokeWeight(2);
   circle(centerX, centerY, handleLength * 2);
 
+  //範囲
+  strokeWeight(2);
+  stroke(0);
+  fill(255, 255, 255);
+  circle(centerX, centerY + 50, 10);
+  circle(centerX + 43, centerY + 25, 10); //した
+  circle(centerX + 43, centerY - 25, 10);
+  circle(centerX, centerY - 50, 10);
+
   // ハンドルの点を描画
   fill(255, 0, 0);
   noStroke();
-  circle(handleX, handleY, 10);
+  circle(handleX, handleY, 15);
 
   // 線を描画
-  stroke(255, 0, 0);
+  stroke(0, 0, 255);
+  strokeWeight(5);
   line(centerX, centerY, handleX, handleY); // ハンドルに向かう線
   line(
     centerX,
@@ -329,6 +356,13 @@ function handle() {
     centerX - (handleX - centerX),
     centerY - (handleY - centerY)
   ); // 円の中心から反対方向に向かう線
+
+  // ハンドルによる自機の移動
+  if (handleY > centerY + 25) {
+    playerX += 4;
+  } else if (handleY < centerY - 25) {
+    playerX -= 4;
+  }
 }
 
 function AnotherAngle() {
@@ -370,6 +404,9 @@ function AnotherAngle() {
   ellipse(200, 150 + gameHeight, 80, 80);
   ellipse(200, 150 + gameHeight, 150, 150);
 
+  stroke(166, 222, 240);
+  ellipse(200, 150 + gameHeight, 150, 150);
+
   // 右側に右三角矢印を描く
   if (relativeEnemyX >= 400) {
     fill(255);
@@ -386,6 +423,7 @@ function AnotherAngle() {
   // 左側に左三角矢印を描く
   if (relativeEnemyX <= 0) {
     fill(255);
+    noStroke();
     triangle(
       50,
       relativeEnemyY,
