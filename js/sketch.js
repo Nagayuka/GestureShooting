@@ -80,7 +80,7 @@ function setup() {
       // ---------------------------
       // ここに自機を動かす処理を書く
       // ---------------------------
-      if (name === 'BAN' && !missileActive) {
+      if (name === 'UP' && !missileActive) {
         sound_missile.play();
         missileX = playerX + playerSize / 2;
         missileY = playerY;
@@ -90,9 +90,34 @@ function setup() {
       else if (name === 'DOWN') {
         playerY += 5;
       }
-      else if (name === 'UP') {
+      else if (name === 'BAN') {
         playerY -= 5;
       }
+
+      if (name === 'UP') {
+        if (gameState === GAME_STATE_TITLE) {
+          // ゲームをリスタートする
+          gameState = GAME_STATE_PLAYING;
+          timer = gameTime;
+          bgm_title.stop();
+          bgm_end.stop();
+          bgm_playing.loop();
+
+
+        }
+      }
+
+
+      if (name === 'OK') {
+
+        playerX = 10;
+      }
+
+      if (name === 'tyoki') {
+        playerX = 390;
+      }
+
+
     }
   }
 
@@ -194,9 +219,24 @@ function drawTitleScreen() {
   fill(0);
   textAlign(CENTER);
   textSize(30);
-  text("Space War", width / 2, gameHeight / 2);
+  text("新しい顔を投げよう", width / 2, 100);
   textSize(20);
-  text("Press Space to Start", width / 2, gameHeight / 2 + 40);
+  text("Press Space to Start", width / 2, 140);
+
+  noStroke();
+  fill(255, 200, 200, 180);
+  ellipse(200, 250, 150, 150);
+
+  fill(0, 0, 0, 180);
+  ellipse(180, 220, 10, 20);
+  ellipse(220, 220, 10, 20);
+
+  fill(255, 0, 0, 180);
+  ellipse(200, 250, 50, 50);
+  //オレンジに塗る
+  fill(255, 100, 0, 180);
+  ellipse(250, 250, 50, 50);
+  ellipse(150, 250, 50, 50);
 }
 
 function drawGameOverScreen() {
@@ -224,7 +264,10 @@ function updateGame() {
     playerY -= 5;
   } else if (keyIsDown(DOWN_ARROW)) {
     playerY += 5;
-  }
+  } //もしをa押したら100,100に移動
+
+
+
 
   // 自機の範囲制限
   playerX = constrain(playerX, 0, width - playerSize);
@@ -327,6 +370,7 @@ function drawGame() {
   fill(209, 109, 19);
   rect(playerX, playerY, playerSize, playerSize);
 
+
   // ミサイルの描画 黄色
   if (missileActive) {
     fill(200, 200, 0);
@@ -338,8 +382,13 @@ function drawGame() {
   fill(255, 0, 0);
   noStroke();
   rect(enemyX, enemyY, enemySize, enemySize);
+  //黄色の四角をかく
+  fill(255, 255, 0);
+  rect(enemyX, enemyY, enemySize, 20);
+
 
   // スコアの表示
+  fill(0);
   textAlign(RIGHT);
   textSize(20);
   text("Score: " + score, width - 20, 30);
@@ -400,6 +449,10 @@ function handle() {
   } else if (handleY < centerY - 45) {
     playerX -= 5;
   }
+
+
+
+
 }
 
 function AnotherAngle() {
@@ -530,7 +583,7 @@ function AnotherAngle() {
 
   handle();
 
-  //もしmissileactiveがtrueなら、丸を描く
+  //もしmissileactiveがtrueなら、アンパンを描く
   if (missileActive) {
     noStroke();
     fill(255, 200, 200, 180);
@@ -549,7 +602,6 @@ function AnotherAngle() {
   }
 }
 
-function keyPressed() { }
 
 function startGame() {
   // 初期化
@@ -565,6 +617,8 @@ function startGame() {
   bgm_playing.loop();
   gameState = GAME_STATE_PLAYING;
   timer = gameTime;
+
+
 }
 
 function titleGame() {
@@ -572,4 +626,17 @@ function titleGame() {
   bgm_end.stop();
   bgm_playing.stop();
   gameState = GAME_STATE_TITLE;
+}
+
+function keyPressed() {
+  if (keyCode === 32) {
+    if (gameState === GAME_STATE_TITLE || gameState === GAME_STATE_GAMEOVER) {
+      // ゲームをリスタートする
+      gameState = GAME_STATE_PLAYING;
+      timer = gameTime;
+
+      bgm_title.stop();
+      bgm_playing.loop();
+    }
+  }
 }
