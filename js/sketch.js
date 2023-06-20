@@ -64,28 +64,37 @@ function setup() {
   let p5canvas = createCanvas(400, 800);
   p5canvas.parent("#canvas");
 
+
+
   // お手々が見つかると以下の関数が呼び出される．resultsに検出結果が入っている．
   // お手々が見つからない場合はresultsはundefinedになる．
   gotHands = function (results) {
     // hr: Hand Results
     hr = results;
     if (hr.gestures.length > 0) {
-      let score = hr.gestures[0][0].score;
-      let name = hr.gestures[0][0].categoryName;
+      let gesture = hr.gestures[0][0];
+      let score = gesture.score;
+      let name = gesture.categoryName;
       console.log(name, score);
-    }
 
-    // ---------------------------
-    // ここに自機を動かす処理を書く
-    // ---------------------------
+      // ---------------------------
+      // ここに自機を動かす処理を書く
+      // ---------------------------
+      if (name === 'BAN' && !missileActive) {
+        sound_missile.play();
+        missileX = playerX + playerSize / 2;
+        missileY = playerY;
+        missileActive = true;
+      }
 
-    if ((results === "BAN") & !missileActive) {
-      sound_missile.play();
-      missileX = playerX + playerSize / 2;
-      missileY = playerY;
-      missileActive = true;
+      else if (name === 'DOWN') {
+        playerY += 5;
+      }
+      else if (name === 'UP') {
+        playerY -= 5;
+      }
     }
-  };
+  }
 
   // 初期化
   playerX = width / 2;
@@ -382,9 +391,13 @@ function handle() {
   ); // 円の中心から反対方向に向かう線
 
   // ハンドルによる自機の移動
-  if (handleY > centerY + 25) {
+  if (handleY > centerY + 25 && handleY < centerY + 45) {
+    playerX += 3;
+  } else if (handleY < centerY - 25 && handleY > centerY - 45) {
+    playerX -= 3;
+  } else if (handleY > centerY + 45) {
     playerX += 5;
-  } else if (handleY < centerY - 25) {
+  } else if (handleY < centerY - 45) {
     playerX -= 5;
   }
 }
@@ -536,7 +549,7 @@ function AnotherAngle() {
   }
 }
 
-function keyPressed() {}
+function keyPressed() { }
 
 function startGame() {
   // 初期化
