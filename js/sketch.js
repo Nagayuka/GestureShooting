@@ -634,6 +634,9 @@ function keyPressed() {
       // ゲームをリスタートする
       gameState = GAME_STATE_PLAYING;
       timer = gameTime;
+      enemyY = 0;
+      playerX = 150;
+      playerY = 800;
 
       bgm_title.stop();
       bgm_playing.loop();
