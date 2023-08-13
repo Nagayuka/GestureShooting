@@ -19,7 +19,8 @@
 <body>
 
   <body>
-    <h1>新しい顔を投げよう</h1>
+    <h1>新しい顔を投げよう！</h1>
+
     <p id="message"></p>
     <div class="container">
       <div>
@@ -27,6 +28,23 @@
           ENABLE WEBCAM
         </button>
         <video id="webcam" style="height:400px;" autoplay playsinline></video>
+            <p>
+      mediapipeのジェスチャー認識を使い、シューティングゲームを作りました。
+
+      上のキャンバスが上から見た図、下が正面から見た図です。<br>
+
+操作<br>
+
+カメラをONにし、車のハンドルを運転するように右手を上下させると左右に移動します。
+
+※右手で行なってください。<br>
+
+👍左右移動(親指の位置を読み取り、上下に比例して左右に動く。)<br>
+
+👉顔を投げる&ゲームスタート<br>
+🤙下(手前)に移動<br>
+🫱上(奥)に移動<br>
+    </p>
       </div>
       <div>
         <button id="gameButton" onclick="startGame();">
